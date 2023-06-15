@@ -1,13 +1,21 @@
 package com.example.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
 
 @Entity(name="Student")
 @Table(
@@ -61,6 +69,21 @@ public class Student {
         )
     private Integer age;
 
+    @OneToOne(
+        mappedBy = "student", //  this mapped by creates bidirectional
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+        orphanRemoval = true
+    ) 
+    private StudentIdCard studentIdCard;
+
+    @OneToMany(
+        mappedBy = "student",
+        orphanRemoval = true,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+        fetch = FetchType.LAZY  //better to make lazy fro oneToMany
+    )
+    private List<Book> books = new ArrayList<>();
+
     public Student(){}
 
     public Student(String firstName, String lastName, String email, Integer age) {
@@ -69,7 +92,6 @@ public class Student {
         this.email = email;
         this.age = age;
     }
-
 
     public Long getId() {
         return id;
@@ -100,6 +122,28 @@ public class Student {
     }
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public void addBook(Book book){
+        if(!this.books.contains(book)){
+            this.books.add(book);
+            book.setStudent(this);
+        }
+    }
+
+    public void removeBook(Book book){
+        if(this.books.contains(book)){
+            this.books.remove(book);
+            book.setStudent(null);
+        }
+    }
+
+    public void setStudentIdCard(StudentIdCard studentIdCard) {
+        this.studentIdCard = studentIdCard;
+    }
+
+    public List<Book> getBooks(){
+        return this.books;
     }
     
     @Override
