@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,6 +52,12 @@ public class Application {
                     student);
             
             student.setStudentIdCard(studentIdCard);
+
+            student.enrolToCourse(
+                new Course("Computer Science", "IT"));
+
+            student.enrolToCourse(
+                new Course("Amigoscode Spring Data JPA", "IT"));
 
             studentRepository.save(student);
 

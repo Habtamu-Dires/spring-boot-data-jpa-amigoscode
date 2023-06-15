@@ -7,9 +7,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
@@ -84,6 +88,22 @@ public class Student {
     )
     private List<Book> books = new ArrayList<>();
 
+    @ManyToMany(
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
+    @JoinTable(
+        name = "enrolment",
+        joinColumns = @JoinColumn(
+            name = "student_id",
+            foreignKey = @ForeignKey(name = "enrolment_student_id_fk")
+        ),
+        inverseJoinColumns = @JoinColumn(
+            name = "course_id",
+            foreignKey = @ForeignKey(name = "enrolment_course_id_fk")
+        )
+    )
+    private List<Course> courses = new ArrayList<>();
+
     public Student(){}
 
     public Student(String firstName, String lastName, String email, Integer age) {
@@ -144,6 +164,20 @@ public class Student {
 
     public List<Book> getBooks(){
         return this.books;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void enrolToCourse(Course course){
+        courses.add(course);
+        course.getStudents().add(this);
+    }
+
+    public void unEnrolToCourse(Course course){
+        courses.remove(course);
+        course.getStudents().remove(this); 
     }
     
     @Override
